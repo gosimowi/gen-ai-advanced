@@ -2,7 +2,6 @@ import os
 from functools import lru_cache
 from pathlib import Path
 
-
 import yaml
 from pydantic import BaseModel, Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -10,24 +9,34 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 SETTINGS_DIR = Path(__file__).resolve().parent.parent / "settings"
 TASKS_FILE = Path(__file__).resolve().parent / "tasks.yaml"
 
+
 class Config(BaseSettings):
+    """Secrets and environment knobs read from the active .env file."""
+
     model_config = SettingsConfigDict(
         env_file_encoding="utf-8",
-        extra="ignore"
+        extra="ignore",
     )
 
     api_key: SecretStr = Field(validation_alias="OPEN_ROUTER_API_KEY")
+    database_url: SecretStr = Field(validation_alias="DATABASE_URL")
+    embedding_model: str = Field(
+        default="openai/text-embedding-3-small",
+        validation_alias="EMBEDDING_MODEL",
+    )
     llm_max_retries: int = Field(
         default=2,
         validation_alias="LLM_MAX_RETRIES",
     )
     log_level: str = "DEBUG"
 
+
 class TaskConfig(BaseModel):
     """Model pool and sampling for a single task."""
 
-    temperature: float = Field(ge=0)
+    temperature: float
     models: list[str] = Field(min_length=1)
+
 
 class TasksConfig(BaseModel):
     """All task definitions loaded from tasks.yaml."""
@@ -39,7 +48,7 @@ class TasksConfig(BaseModel):
         if name not in self.tasks:
             raise KeyError(f"Unknown task '{name}'. Known tasks: {sorted(self.tasks)}")
         return self.tasks[name]
-    
+
 
 @lru_cache
 def get_config() -> Config:

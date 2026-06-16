@@ -10,12 +10,15 @@ Intent = Literal[  # new code
     "security_breach",  # new code
 ]  # new code
 
+
 class IntentResult(BaseModel):
     intent: Intent
     reason: str
 
+
 class AgentState(TypedDict):
     question: str
     intent: NotRequired[IntentResult]
+
 
 StateUpdate = dict[str, Any]

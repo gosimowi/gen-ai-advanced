@@ -1,11 +1,12 @@
 import asyncio
-from langgraph.graph import END, START, StateGraph 
+from langgraph.graph import END, START, StateGraph
 
-from agent.nodes.intent import arecognize_intent 
+from agent.nodes.intent import arecognize_intent
 from agent.state import AgentState
 from utils.logger import get_logger
 
 logger = get_logger(__name__)
+
 
 def build_graph():
     builder = StateGraph(AgentState)
@@ -16,6 +17,7 @@ def build_graph():
 
     return builder.compile()
 
+
 async def main() -> None:  # new code
     graph = build_graph()  # new code
     for question in [  # new code
@@ -25,10 +27,11 @@ async def main() -> None:  # new code
     ]:  # new code
         final = await graph.ainvoke({"question": question})  # new code
         intent = final["intent"]  # new code
-        logger.info(f"Q: {question}\n   -> {intent.intent} | reason: {intent.reason}")  # new code
+        logger.info(
+            f"Q: {question}\n   -> {intent.intent} | reason: {intent.reason}"
+        )  # new code
 
 
 if __name__ == "__main__":  # new code
     asyncio.run(main())
     # main()  # new code
-

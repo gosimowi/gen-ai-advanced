@@ -101,13 +101,20 @@ class LLMClient:
             return parse_or_repair(result, schema)
 
         return _attempt()
-    
-    async def acomplete(self, prompt_template: str, variables: dict) -> BaseMessage:  # new code
-        chain = ChatPromptTemplate.from_template(prompt_template) | self.engine  # new code
+
+    async def acomplete(
+        self, prompt_template: str, variables: dict
+    ) -> BaseMessage:  # new code
+        chain = (
+            ChatPromptTemplate.from_template(prompt_template) | self.engine
+        )  # new code
         return await chain.ainvoke(variables)  # new code
 
     async def astructured(  # new code
-        self, prompt_template: str, variables: dict, schema: type[BaseModel]  # new code
+        self,
+        prompt_template: str,
+        variables: dict,
+        schema: type[BaseModel],  # new code
     ) -> BaseModel:  # new code
         @retry(  # new code
             retry=retry_if_exception_type(ValueError),  # new code
@@ -115,10 +122,13 @@ class LLMClient:
             reraise=True,  # new code
         )  # new code
         async def _attempt() -> BaseModel:  # new code
-            structured_engine = self.engine.with_structured_output(schema, include_raw=True)  # new code
-            chain = ChatPromptTemplate.from_template(prompt_template) | structured_engine  # new code
+            structured_engine = self.engine.with_structured_output(
+                schema, include_raw=True
+            )  # new code
+            chain = (
+                ChatPromptTemplate.from_template(prompt_template) | structured_engine
+            )  # new code
             result = await chain.ainvoke(variables)  # new code
             return parse_or_repair(result, schema)  # new code
 
         return await _attempt()  # new code
-
