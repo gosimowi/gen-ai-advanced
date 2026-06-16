@@ -1,2 +1,8 @@
 ai-advanced-agent-workshop
 .env.dev
+.env
+.env.*
+!.env.example
+.venv/
+__pycache__/
+*.pyc
